@@ -24,7 +24,7 @@ public class User implements Serializable {
     @Column(name = "preferences")
     private String preferences;
 
-    public User(){};
+    public User(){}
 
     public User(String name, String phone, String preferences) {
         this.name = name;

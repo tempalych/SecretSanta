@@ -1,33 +1,42 @@
 package com.tempalych.secretsanta.controller;
 
+import com.tempalych.secretsanta.domain.Gift;
 import com.tempalych.secretsanta.domain.User;
+import com.tempalych.secretsanta.repository.GiftRepository;
 import com.tempalych.secretsanta.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@RestController()
+@Controller
 public class UserController {
     @Autowired
     UserRepository repo;
 
-    @PostMapping("new")
-    public String newUser(@RequestParam String name,
-                          @RequestParam String phone,
-                          @RequestParam String preferences){
-        System.out.println("newUser with params: "+
-                "name = " + name +
-                "phone = " + phone +
-                "preferences = " + preferences);
-        repo.save(new User(name, phone, preferences));
-        return "Пользователь создан: " + name;
+    @Autowired
+    GiftController giftController;
+
+    public User findByName(String name){
+        for (User user:repo.findAll()) {
+            if (user.getName().equals(name)){
+                return user;
+            }
+        }
+        return null;
     }
 
-    @GetMapping("all")
+    public User newUser(String name, String phone, String preferences){
+        System.out.println("newUser with params: "+
+                "name = " + name +
+                " phone = " + phone +
+                " preferences = " + preferences);
+        User newUser = repo.save(new User(name, phone, preferences));
+        return newUser;
+    }
+
     public List<String> findAll(){
         List<String> userUI = new ArrayList<>();
         for (User user:repo.findAll()
@@ -37,14 +46,13 @@ public class UserController {
         return userUI;
     }
 
-    @RequestMapping("/")
-    public String getUserList(){
+    public List<User> getUserList(){
         System.out.println("getUserListController");
-        return "Привет из сахарницы";
+        return repo.findAll();
     }
 
-    @GetMapping("shuffle")
     public String shuffle(){
+        giftController.repo.deleteAll();
         List<User> users = repo.findAll();
         int[] indexes = new int[users.size()];
 
@@ -61,9 +69,10 @@ public class UserController {
             } else {
                 user2 = users.get(indexes[i + 1]);
             }
-            result += user1.getName() +
-                    " дарит пользователю " + user2.getName() +
-                    ", который любит " + user2.getPreferences() + ";\n";
+
+            giftController.newGift(user1.getName(), user2.getName());
+
+            result += "@" + user1.getName() + " дарит пользователю @" + user2.getName() + ";\n";
         }
         return result;
     }
@@ -76,6 +85,10 @@ public class UserController {
             arr[index] = arr[i];
             arr[i] = a;
         }
+    }
+
+    public String getGifter(String username){
+        return giftController.getGifter(username);
     }
 
 

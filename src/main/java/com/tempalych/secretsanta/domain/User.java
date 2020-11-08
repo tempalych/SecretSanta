@@ -15,22 +15,28 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @Column(name = "telegram_id")
+    private int telegramId;
+
     @Column(name = "name")
     private String name;
-
-    @Column(name = "phone")
-    private String phone;
 
     @Column(name = "preferences")
     private String preferences;
 
+    @Column(name = "\"group\"")
+    private String group;
+
+    @Column(name = "chat_id")
+    private long chatId;
+
     public User(){}
 
-    public User(String name, String phone, String preferences) {
+    public User(String name, String preferences, int telegramId, String group, long chatId) {
         this.name = name;
-        this.phone = phone;
         this.preferences = preferences;
+        this.telegramId = telegramId;
+        this.group = group;
+        this.chatId = chatId;
     }
-
-
 }

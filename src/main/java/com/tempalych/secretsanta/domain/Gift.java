@@ -16,16 +16,17 @@ public class Gift implements Serializable{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(name = "usergives")
-    private String userGives;
+    @Column(name = "giver")
+    private long giver;
 
-    @Column(name = "usertakes")
-    private String userTakes;
+    @Column(name = "receiver")
+    private long receiver;
 
-    public Gift(){}
+    public Gift(long giver, long receiver) {
+        this.giver = giver;
+        this.receiver = receiver;
+    }
 
-    public Gift(String userGives, String userTakes) {
-        this.userGives = userGives;
-        this.userTakes = userTakes;
+    public Gift() {
     }
 }

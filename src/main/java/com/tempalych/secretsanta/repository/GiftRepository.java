@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface GiftRepository extends JpaRepository<Gift, Long> {
     List<Gift> findAll();
+    Gift getByGiver(long giver);
+    Gift getByReceiver(long receiver);
 }

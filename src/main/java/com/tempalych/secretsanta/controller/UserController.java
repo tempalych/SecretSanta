@@ -1,8 +1,6 @@
 package com.tempalych.secretsanta.controller;
 
-import com.tempalych.secretsanta.domain.Gift;
 import com.tempalych.secretsanta.domain.User;
-import com.tempalych.secretsanta.repository.GiftRepository;
 import com.tempalych.secretsanta.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,82 +12,70 @@ import java.util.Random;
 @Controller
 public class UserController {
     @Autowired
-    UserRepository repo;
+    UserRepository userRepository;
 
-    @Autowired
-    GiftController giftController;
-
-    public User findByName(String name){
-        for (User user:repo.findAll()) {
-            if (user.getName().equals(name)){
-                return user;
-            }
-        }
-        return null;
-    }
-
-    public User newUser(String name, String phone, String preferences){
+    public User newUser(String name, String preferences, int telegramId, String group, long chatId){
         System.out.println("newUser with params: "+
                 "name = " + name +
-                " phone = " + phone +
-                " preferences = " + preferences);
-        User newUser = repo.save(new User(name, phone, preferences));
+                " preferences = " + preferences +
+                " group = " + group +
+                "chatId = " + chatId);
+        User newUser = userRepository.save(new User(name, preferences, telegramId, group, chatId));
         return newUser;
     }
 
-    public List<String> findAll(){
-        List<String> userUI = new ArrayList<>();
-        for (User user:repo.findAll()
-             ) {
-            userUI.add(user.getName());
-        }
-        return userUI;
+    public User findByTelegramId(int telegramId) {
+        return userRepository.findByTelegramId(telegramId);
     }
 
-    public List<User> getUserList(){
-        System.out.println("getUserListController");
-        return repo.findAll();
+    public List<User> findByGroup(String group) {
+        return userRepository.findByGroup(group);
     }
 
-    public String shuffle(){
-        giftController.repo.deleteAll();
-        List<User> users = repo.findAll();
-        int[] indexes = new int[users.size()];
+    public void updateUserGroup(User user, String group) {
+        user.setGroup(group);
+        userRepository.save(user);
+    }
 
-        for(int i = 0; i < users.size(); i++){
-            indexes[i] = i;
-        }
-        shuffleArray(indexes);
-        String result = "";
-        for(int i = 0; i < indexes.length; i++){
-            User user1 = users.get(indexes[i]);
-            User user2;
-            if (i == indexes.length - 1){
-                user2 = users.get(indexes[0]);
-            } else {
-                user2 = users.get(indexes[i + 1]);
-            }
+    public User findById(long id) {
+        return userRepository.findById(id);
+    }
 
-            giftController.newGift(user1.getName(), user2.getName());
+    public List<String> getRandomEmoji(int count) {
+        List<String> result = new ArrayList<>();
+        List<String> emojis = new ArrayList<>();
+        emojis.add("🐶");
+        emojis.add("🐱");
+        emojis.add("🐸");
+        emojis.add("🐔");
+        emojis.add("🐠");
+        emojis.add("🦊");
+        emojis.add("🐭");
+        emojis.add("🐰");
+        emojis.add("🐻");
+        emojis.add("🐼");
+        emojis.add("🐵");
+        emojis.add("🐷");
+        emojis.add("🐮");
+        emojis.add("🐯");
+        emojis.add("🐨");
+        emojis.add("🐤");
 
-            result += "@" + user1.getName() + " дарит пользователю @" + user2.getName() + ";\n";
+        int cnt = 0;
+        while (cnt < count) {
+            Random rnd = new Random();
+            int index = rnd.nextInt(emojis.size() - 1);
+            result.add(emojis.get(index));
+            emojis.remove(index);
+            cnt ++;
         }
         return result;
     }
 
-    static void shuffleArray(int[] arr){
-        Random rnd = new Random();
-        for (int i = arr.length - 1; i > 0; i--){
-            int index = rnd.nextInt(i + 1);
-            int a = arr[index];
-            arr[index] = arr[i];
-            arr[i] = a;
-        }
-    }
 
-    public String getGifter(String username){
-        return giftController.getGifter(username);
-    }
+//    public String getGifter(String username){
+//        return giftController.getGifter(username);
+//    }
 
 
 }
